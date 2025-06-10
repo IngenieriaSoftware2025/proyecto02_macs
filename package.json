@@ -1,7 +1,7 @@
 {
-  "name": "demo-app",
+  "name": "proyecto02_macs",
   "version": "1.0.0",
-  "description": "Aplicacion MVC demo",
+  "description": "Aplicacion",
   "main": "index.js",
   "scripts": {
     "build": "webpack",
