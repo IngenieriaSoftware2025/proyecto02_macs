@@ -17,6 +17,12 @@ FOREIGN KEY (celular_marca_id) REFERENCES marca(marca_id)
 CREATE TABLE usuarios1(
 usuario_id SERIAL PRIMARY KEY,
 usuario_nombre VARCHAR(150) NOT NULL,
+usuario_dpi VARCHAR(13) NOT NULL,
+usuario_telefono VARCHAR(8) NOT NULL,
+usuario_correo VARCHAR(100) NOT NULL,
+usuario_puesto VARCHAR(50) NOT NULL,
+usuario_password VARCHAR(150),
+usuario_rol VARCHAR(25) DEFAULT 'EMPLEADO',
 usuario_situacion SMALLINT DEFAULT 1,
 usuario_fecha_creacion DATE DEFAULT TODAY
 );

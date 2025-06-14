@@ -16,7 +16,8 @@
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <a class="navbar-brand" href="/proyecto02_macs/">
+            <!-- CAMBIADO: Ahora apunta a /inicio -->
+            <a class="navbar-brand" href="/proyecto02_macs/inicio">
                 <img src="<?= asset('./images/cit.png') ?>" width="35px'" alt="cit" >
                 Sistema Celulares
             </a>
@@ -24,12 +25,19 @@
                 
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0" style="margin: 0;">
                     <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="/proyecto02_macs/"><i class="bi bi-house-fill me-2"></i>Inicio</a>
+                        <!-- CAMBIADO: Ahora apunta a /inicio -->
+                        <a class="nav-link" aria-current="page" href="/proyecto02_macs/inicio"><i class="bi bi-house-fill me-2"></i>Inicio</a>
                     </li>
 
                     <li class="nav-item">
                         <a class="nav-link px-3" style="background: none;" href="/proyecto02_macs/clientes">
                             <i class="bi bi-people-fill me-2"></i>Clientes
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link px-3" style="background: none;" href="/proyecto02_macs/usuarios">
+                            <i class="bi bi-people-fill me-2"></i>Usuarios/Empleados
                         </a>
                     </li>
 
@@ -69,17 +77,17 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-dark" id="dropwdownRevision" style="margin: 0;">
                             <li>
-                                <a class="dropdown-item nav-link text-white" href="/ejemplo/estadisticas"><i class="ms-lg-0 ms-2 bi bi-graph-up me-2"></i>Estadísticas</a>
+                                <a class="dropdown-item nav-link text-white" href="/proyecto02_macs/estadisticas"><i class="ms-lg-0 ms-2 bi bi-graph-up me-2"></i>Estadísticas</a>
                             </li>
                             <li>
-                                <a class="dropdown-item nav-link text-white" href="/ejemplo/historial"><i class="ms-lg-0 ms-2 bi bi-clock-history me-2"></i>Historial Ventas</a>
+                                <a class="dropdown-item nav-link text-white" href="/proyecto02_macs/historial"><i class="ms-lg-0 ms-2 bi bi-clock-history me-2"></i>Historial Ventas</a>
                             </li>
                         </ul>
                     </div> 
 
                 </ul> 
-                <div class="col-lg-1 d-grid mb-lg-0 mb-2">
-                    <a href="/menu/" class="btn btn-danger"><i class="bi bi-arrow-bar-left"></i>MENÚ</a>
+                <div class="col-lg-1.5 d-grid mb-lg-0 mb-2">
+                    <a href="/proyecto02_macs/" class="btn btn-danger"><i class="bi bi-arrow-bar-left"></i>Cerrar Sesión</a>
                 </div>
 
             
