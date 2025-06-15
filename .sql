@@ -80,11 +80,24 @@ reparacion_marca VARCHAR(100) NOT NULL,
 reparacion_motivo VARCHAR(250) NOT NULL,
 reparacion_trabajador VARCHAR(150) NOT NULL,
 reparacion_servicio VARCHAR(100) NOT NULL,
-reparacion_estado VARCHAR(50) DEFAULT 'recibido',
+reparacion_estado VARCHAR(50) DEFAULT 'recibido',  
 reparacion_precio DECIMAL(10,2) NOT NULL,
-reparacion_fecha_entrega DATE,
+reparacion_fecha_entrega DATE,                    
 reparacion_situacion SMALLINT DEFAULT 1,
-reparacion_fecha_creacion DATE DEFAULT TODAY,
+reparacion_fecha_creacion DATE DEFAULT TODAY,     
 FOREIGN KEY (reparacion_cliente_id) REFERENCES cliente(cliente_id),
 FOREIGN KEY (reparacion_usuario_id) REFERENCES usuarios1(usuario_id)
+);
+
+CREATE TABLE historial_ventas(
+historial_id SERIAL PRIMARY KEY,
+historial_tipo VARCHAR(20) NOT NULL,
+historial_referencia_id INT NOT NULL,
+historial_cliente_id INT NOT NULL,
+historial_usuario_id INT NOT NULL,
+historial_descripcion VARCHAR(250) NOT NULL,
+historial_monto DECIMAL(10,2) NOT NULL,
+historial_estado VARCHAR(20) NOT NULL,
+historial_situacion SMALLINT DEFAULT 1,
+historial_fecha_creacion DATE DEFAULT TODAY
 );

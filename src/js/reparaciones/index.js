@@ -146,11 +146,54 @@ const cargarTecnicos = async () => {
     }
 }
 
+const organizarDatosPorEstado = (data) => {
+    const estados = ['recibido', 'en_proceso', 'finalizado', 'entregado'];
+    const iconos = {
+        'recibido': '',
+        'en_proceso': '', 
+        'finalizado': '',
+        'entregado': ''
+    };
+    const nombres = {
+        'recibido': 'RECIBIDO',
+        'en_proceso': 'EN PROCESO',
+        'finalizado': 'FINALIZADO', 
+        'entregado': 'ENTREGADO'
+    };
+    
+    let datosOrganizados = [];
+    let contador = 1;
+    
+    estados.forEach(estado => {
+        const reparacionesEstado = data.filter(reparacion => reparacion.reparacion_estado === estado);
+        
+        if (reparacionesEstado.length > 0) {
+            datosOrganizados.push({
+                esSeparador: true,
+                estado: estado,
+                nombre: nombres[estado],
+                icono: iconos[estado],
+                cantidad: reparacionesEstado.length
+            });
+            
+            reparacionesEstado.forEach(reparacion => {
+                datosOrganizados.push({
+                    ...reparacion,
+                    numeroConsecutivo: contador++,
+                    esSeparador: false
+                });
+            });
+        }
+    });
+    
+    return datosOrganizados;
+}
+
 const guardarReparacion = async e => {
     e.preventDefault();
     BtnGuardar.disabled = true;
 
-    if (!validarFormulario(formReparacion, ['reparacion_id', 'reparacion_fecha_creacion', 'reparacion_situacion'])) {
+    if (!validarFormulario(formReparacion, ['reparacion_id', 'reparacion_fecha_creacion', 'reparacion_situacion', 'reparacion_estado'])) {
         Swal.fire({
             position: "center",
             icon: "info",
@@ -215,10 +258,12 @@ const BuscarReparaciones = async () => {
 
         if (codigo == 1) {
             console.log('Reparaciones encontradas:', data);
+            
+            const datosOrganizados = organizarDatosPorEstado(data);
 
             if (datatable) {
                 datatable.clear().draw();
-                datatable.rows.add(data).draw();
+                datatable.rows.add(datosOrganizados).draw();
             }
         } else {
             await Swal.fire({
@@ -232,6 +277,181 @@ const BuscarReparaciones = async () => {
 
     } catch (error) {
         console.log(error);
+    }
+}
+
+const iniciarReparacion = async (e) => {
+    const idReparacion = e.currentTarget.dataset.id;
+
+    const AlertaConfirmar = await Swal.fire({
+        position: "center",
+        icon: "info",
+        title: "¿Iniciar reparación?",
+        text: 'Se iniciará con el proceso de reparación del dispositivo',
+        showConfirmButton: true,
+        confirmButtonText: 'Si, Iniciar',
+        confirmButtonColor: '#28a745',
+        cancelButtonText: 'No, Cancelar',
+        showCancelButton: true
+    });
+
+    if (AlertaConfirmar.isConfirmed) {
+        const body = new FormData();
+        body.append('reparacion_id', idReparacion);
+        
+        const url = `/proyecto02_macs/reparaciones/iniciarAPI`;
+        const config = {
+            method: 'POST',
+            body
+        }
+
+        try {
+            const consulta = await fetch(url, config);
+            const respuesta = await consulta.json();
+            const { codigo, mensaje } = respuesta;
+
+            if (codigo == 1) {
+                await Swal.fire({
+                    position: "center",
+                    icon: "success",
+                    title: "Exito",
+                    text: mensaje,
+                    showConfirmButton: true,
+                });
+                
+                BuscarReparaciones();
+            } else {
+                await Swal.fire({
+                    position: "center",
+                    icon: "error",
+                    title: "Error",
+                    text: mensaje,
+                    showConfirmButton: true,
+                });
+            }
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+}
+
+const finalizarReparacion = async (e) => {
+    const idReparacion = e.currentTarget.dataset.id;
+
+    const AlertaConfirmar = await Swal.fire({
+        position: "center",
+        icon: "info",
+        title: "¿Finalizar reparación?",
+        text: 'Se finalizará con el proceso de reparación del dispositivo',
+        showConfirmButton: true,
+        confirmButtonText: 'Si, Finalizar',
+        confirmButtonColor: '#007bff',
+        cancelButtonText: 'No, Cancelar',
+        showCancelButton: true
+    });
+
+    if (AlertaConfirmar.isConfirmed) {
+        const body = new FormData();
+        body.append('reparacion_id', idReparacion);
+        
+        const url = `/proyecto02_macs/reparaciones/finalizarAPI`;
+        const config = {
+            method: 'POST',
+            body
+        }
+
+        try {
+            const consulta = await fetch(url, config);
+            const respuesta = await consulta.json();
+            const { codigo, mensaje } = respuesta;
+
+            if (codigo == 1) {
+                await Swal.fire({
+                    position: "center",
+                    icon: "success",
+                    title: "Exito",
+                    text: mensaje,
+                    showConfirmButton: true,
+                });
+                
+                BuscarReparaciones();
+            } else {
+                await Swal.fire({
+                    position: "center",
+                    icon: "error",
+                    title: "Error",
+                    text: mensaje,
+                    showConfirmButton: true,
+                });
+            }
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+}
+
+const entregarReparacion = async (e) => {
+    const idReparacion = e.currentTarget.dataset.id;
+
+    const AlertaConfirmar = await Swal.fire({
+        position: "center",
+        icon: "info",
+        title: "¿Entregar reparación?",
+        text: 'Se entregará su dispositivo en buen estado y completamente funcional',
+        showConfirmButton: true,
+        confirmButtonText: 'Si, Entregar',
+        confirmButtonColor: '#ffc107',
+        cancelButtonText: 'No, Cancelar',
+        showCancelButton: true
+    });
+
+    if (AlertaConfirmar.isConfirmed) {
+        const body = new FormData();
+        body.append('reparacion_id', idReparacion);
+        
+        const url = `/proyecto02_macs/reparaciones/entregarAPI`;
+        const config = {
+            method: 'POST',
+            body
+        }
+
+        try {
+            const consulta = await fetch(url, config);
+            const respuesta = await consulta.json();
+            const { codigo, mensaje } = respuesta;
+
+            if (codigo == 1) {
+                await Swal.fire({
+                    position: "center",
+                    icon: "success",
+                    title: "Exito",
+                    text: mensaje,
+                    showConfirmButton: true,
+                });
+                
+                BuscarReparaciones();
+            } else {
+                await Swal.fire({
+                    position: "center",
+                    icon: "error",
+                    title: "Error",
+                    text: mensaje,
+                    showConfirmButton: true,
+                });
+            }
+
+        } catch (error) {
+            console.log(error);
+            await Swal.fire({
+                position: "center",
+                icon: "error",
+                title: "Error",
+                text: "Error de conexión. Intente nuevamente.",
+                showConfirmButton: true,
+            });
+        }
     }
 }
 
@@ -259,56 +479,81 @@ const datatable = new DataTable('#TableReparaciones', {
     `,
     language: lenguaje,
     data: [],
+    ordering: false,
     columns: [
         {
             title: 'No.',
-            data: 'reparacion_id',
+            data: null,
             width: '3%',
-            render: (data, type, row, meta) => meta.row + 1
+            render: (data, type, row, meta) => {
+                if (row.esSeparador) {
+                    return '';
+                }
+                return row.numeroConsecutivo;
+            }
         },
         { 
             title: 'Cliente', 
             data: 'cliente_nombre',
-            width: '8%'
+            width: '8%',
+            render: (data, type, row, meta) => {
+                if (row.esSeparador) {
+                    return `<strong class="text-primary fs-5 text-center w-100 d-block">${row.icono} ${row.nombre} (${row.cantidad})</strong>`;
+                }
+                return data;
+            }
         },
         { 
             title: 'Empleado', 
             data: 'usuario_nombre',
-            width: '8%'
+            width: '8%',
+            render: (data, type, row, meta) => {
+                if (row.esSeparador) return '';
+                return data;
+            }
         },
         { 
             title: 'Marca', 
             data: 'reparacion_marca',
-            width: '6%'
+            width: '6%',
+            render: (data, type, row, meta) => {
+                if (row.esSeparador) return '';
+                return data;
+            }
         },
         { 
             title: 'Modelo', 
             data: 'reparacion_tipo_celular',
-            width: '8%'
+            width: '8%',
+            render: (data, type, row, meta) => {
+                if (row.esSeparador) return '';
+                return data;
+            }
         },
         { 
             title: 'Motivo', 
             data: 'reparacion_motivo',
-            width: '12%'
+            width: '12%',
+            render: (data, type, row, meta) => {
+                if (row.esSeparador) return '';
+                return data;
+            }
         },
         { 
             title: 'Técnico', 
             data: 'reparacion_trabajador',
-            width: '8%'
+            width: '8%',
+            render: (data, type, row, meta) => {
+                if (row.esSeparador) return '';
+                return data;
+            }
         },
         { 
             title: 'Servicio', 
             data: 'reparacion_servicio',
-            width: '8%'
-        },
-        {
-            title: 'Estado',
-            data: 'reparacion_estado',
-            width: '6%',
-            render: (data, type, row) => {
-                if (data === 'recibido') return '<span class="badge bg-warning">Recibido</span>';
-                if (data === 'en_proceso') return '<span class="badge bg-info">En Proceso</span>';
-                if (data === 'finalizado') return '<span class="badge bg-success">Finalizado</span>';
+            width: '8%',
+            render: (data, type, row, meta) => {
+                if (row.esSeparador) return '';
                 return data;
             }
         },
@@ -316,61 +561,127 @@ const datatable = new DataTable('#TableReparaciones', {
             title: 'Precio', 
             data: 'reparacion_precio',
             width: '6%',
-            render: (data, type, row) => {
+            render: (data, type, row, meta) => {
+                if (row.esSeparador) return '';
                 return `Q. ${parseFloat(data).toFixed(2)}`;
             }
         },
         { 
             title: 'Fecha Entrega', 
             data: 'reparacion_fecha_entrega',
-            width: '7%'
+            width: '7%',
+            render: (data, type, row, meta) => {
+                if (row.esSeparador) return '';
+                return data || 'Pendiente';
+            }
         },
         { 
-            title: 'Fecha Creación', 
+            title: 'Fecha Recibido', 
             data: 'reparacion_fecha_creacion',
-            width: '7%'
+            width: '7%',
+            render: (data, type, row, meta) => {
+                if (row.esSeparador) return '';
+                return data;
+            }
         },
         {
-            title: 'Situación',
-            data: 'reparacion_situacion',
+            title: 'Estado',
+            data: 'reparacion_estado',
             width: '5%',
-            render: (data, type, row) => {
-                return data == 1 ? "ACTIVO" : "INACTIVO";
+            render: (data, type, row, meta) => {
+                if (row.esSeparador) return '';
+                
+                const estados = {
+                    'recibido': '<span class="badge bg-warning text-dark">RECIBIDO</span>',
+                    'en_proceso': '<span class="badge bg-info text-white">EN PROCESO</span>',
+                    'finalizado': '<span class="badge bg-success">FINALIZADO</span>',
+                    'entregado': '<span class="badge bg-primary">ENTREGADO</span>'
+                };
+                
+                return estados[data] || data;
             }
         },
         {
             title: 'Acciones',
             data: 'reparacion_id',
-            width: '8%',
+            width: '10%',
             searchable: false,
             orderable: false,
             render: (data, type, row, meta) => {
-                return `
-                 <div class='d-flex justify-content-center'>
-                     <button class='btn btn-warning modificar mx-1' 
-                         data-id="${data}" 
-                         data-cliente="${row.reparacion_cliente_id || ''}"
-                         data-usuario="${row.reparacion_usuario_id || ''}"
-                         data-tipo="${row.reparacion_tipo_celular || ''}"
-                         data-marca="${row.reparacion_marca || ''}"
-                         data-motivo="${row.reparacion_motivo || ''}"
-                         data-trabajador="${row.reparacion_trabajador || ''}"
-                         data-servicio="${row.reparacion_servicio || ''}"
-                         data-estado="${row.reparacion_estado || ''}"
-                         data-precio="${row.reparacion_precio || ''}"
-                         data-fecha="${row.reparacion_fecha_entrega || ''}"
-                         title="Modificar">
-                         <i class='bi bi-pencil-square me-1'></i> Modificar
-                     </button>
-                     <button class='btn btn-danger eliminar mx-1' 
-                         data-id="${data}"
-                         title="Eliminar">
-                        <i class="bi bi-trash3 me-1"></i>Eliminar
-                     </button>
-                 </div>`;
+                if (row.esSeparador) return '';
+                
+                const estado = row.reparacion_estado;
+                let botones = '';
+
+                if (estado === 'recibido') {
+                    botones = `
+                        <button class='btn btn-success btn-sm iniciar mx-1' 
+                            data-id="${data}" 
+                            title="Iniciar Reparación">
+                            <i class='bi bi-play-fill'></i> Iniciar
+                        </button>
+                        <button class='btn btn-warning btn-sm modificar mx-1' 
+                            data-id="${data}" 
+                            data-cliente="${row.reparacion_cliente_id || ''}"
+                            data-usuario="${row.reparacion_usuario_id || ''}"
+                            data-tipo="${row.reparacion_tipo_celular || ''}"
+                            data-marca="${row.reparacion_marca || ''}"
+                            data-motivo="${row.reparacion_motivo || ''}"
+                            data-trabajador="${row.reparacion_trabajador || ''}"
+                            data-servicio="${row.reparacion_servicio || ''}"
+                            data-precio="${row.reparacion_precio || ''}"
+                            title="Modificar">
+                            <i class='bi bi-pencil'></i>
+                        </button>
+                        <button class='btn btn-danger btn-sm eliminar mx-1' 
+                            data-id="${data}"
+                            title="Eliminar">
+                            <i class="bi bi-trash3"></i> Eliminar
+                        </button>
+                    `;
+                }
+                else if (estado === 'en_proceso') {
+                    botones = `
+                        <button class='btn btn-primary btn-sm finalizar mx-1' 
+                            data-id="${data}" 
+                            title="Finalizar Reparación">
+                            <i class='bi bi-check-circle'></i> Finalizar
+                        </button>
+                    `;
+                }
+                else if (estado === 'finalizado') {
+                    botones = `
+                        <button class='btn btn-warning btn-sm entregar mx-1' 
+                            data-id="${data}" 
+                            title="Entregar">
+                            <i class='bi bi-box-seam'></i> Entregar
+                        </button>
+                    `;
+                }
+                else if (estado === 'entregado') {
+                    botones = `
+                        <button class='btn btn-danger btn-sm eliminar mx-1' 
+                            data-id="${data}"
+                            title="Eliminar">
+                            <i class="bi bi-trash3"></i> Eliminar
+                        </button>
+                    `;
+                }
+
+                return `<div class='d-flex justify-content-center'>${botones}</div>`;
             }
         }
-    ]
+    ],
+    rowCallback: function(row, data) {
+        if (data.esSeparador) {
+            row.classList.add('table-secondary');
+            row.style.backgroundColor = '#f8f9fa';
+            row.cells[1].colSpan = 12;
+            for (let i = 2; i < row.cells.length; i++) {
+                row.cells[i].style.display = 'none';
+            }
+        }
+    }
 });
 
 const llenarFormulario = (event) => {
@@ -384,9 +695,7 @@ const llenarFormulario = (event) => {
     document.getElementById('reparacion_motivo').value = datos.motivo;
     document.getElementById('reparacion_trabajador').value = datos.trabajador;
     document.getElementById('reparacion_servicio').value = datos.servicio;
-    document.getElementById('reparacion_estado').value = datos.estado;
     document.getElementById('reparacion_precio').value = datos.precio;
-    document.getElementById('reparacion_fecha_entrega').value = datos.fecha;
 
     BtnGuardar.classList.add('d-none');
     BtnModificar.classList.remove('d-none');
@@ -406,7 +715,7 @@ const ModificarReparacion = async (event) => {
     event.preventDefault();
     BtnModificar.disabled = true;
 
-    if (!validarFormulario(formReparacion, ['reparacion_id', 'reparacion_fecha_creacion', 'reparacion_situacion'])) {
+    if (!validarFormulario(formReparacion, ['reparacion_id', 'reparacion_fecha_creacion', 'reparacion_situacion', 'reparacion_estado'])) {
         Swal.fire({
             position: "center",
             icon: "info",
@@ -513,12 +822,14 @@ cargarClientes();
 cargarEmpleados();
 cargarTecnicos();
 
+datatable.on('click', '.iniciar', iniciarReparacion);
+datatable.on('click', '.finalizar', finalizarReparacion);
+datatable.on('click', '.entregar', entregarReparacion);
 datatable.on('click', '.eliminar', EliminarReparaciones);
 datatable.on('click', '.modificar', llenarFormulario);
+
 formReparacion.addEventListener('submit', guardarReparacion);
-
 InputPrecio.addEventListener('change', ValidarPrecio);
-
 BtnLimpiar.addEventListener('click', limpiarTodo);
 BtnModificar.addEventListener('click', ModificarReparacion);
 BtnBuscarReparaciones.addEventListener('click', MostrarTabla);

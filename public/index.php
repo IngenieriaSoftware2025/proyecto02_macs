@@ -12,6 +12,7 @@ Use Controllers\InventarioController;
 use Controllers\VentasController;
 use Controllers\UsuariosController;
 use Controllers\ReparacionesController;
+use Controllers\HistorialVentasController;
 
 $router = new Router();
 $router->setBaseURL('/' . $_ENV['APP_NAME']);
@@ -82,6 +83,13 @@ $router->get('/reparaciones/buscarClientesAPI', [ReparacionesController::class, 
 $router->get('/reparaciones/buscarEmpleadosAPI', [ReparacionesController::class, 'buscarEmpleadosAPI']);
 $router->get('/reparaciones/buscarTecnicosAPI', [ReparacionesController::class, 'buscarTecnicosAPI']);
 $router->get('/reparaciones/buscarUsuariosAPI', [ReparacionesController::class, 'buscarUsuariosAPI']);
+$router->post('/reparaciones/iniciarAPI', [ReparacionesController::class, 'iniciarReparacionAPI']);
+$router->post('/reparaciones/finalizarAPI', [ReparacionesController::class, 'finalizarReparacionAPI']);
+$router->post('/reparaciones/entregarAPI', [ReparacionesController::class, 'entregarReparacionAPI']);
 
-// Comprueba y valida las rutas, que existan y les asigna las funciones del Controlador
+//historial
+$router->get('/historial', [HistorialVentasController::class, 'renderizarPagina']);
+$router->get('/historial/buscarAPI', [HistorialVentasController::class, 'buscarAPI']);
+$router->get('/historial/buscarDetalleAPI', [HistorialVentasController::class, 'buscarDetalleAPI']);
+
 $router->comprobarRutas();

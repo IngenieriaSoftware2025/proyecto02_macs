@@ -7,6 +7,7 @@ use MVC\Router;
 use Model\ActiveRecord;
 use Model\Ventas;
 use Model\DetalleVenta;
+use Model\HistorialVentas;
 
 class VentasController extends ActiveRecord
 {
@@ -113,6 +114,27 @@ class VentasController extends ActiveRecord
                     $sql_update = "UPDATE inventario SET inventario_cantidad = inventario_cantidad - {$producto['cantidad']} WHERE inventario_id = {$producto['inventario_id']}";
                     self::SQL($sql_update);
                 }
+
+                $descripcion = "Venta de productos: ";
+                $productos_nombres = array();
+                foreach ($productos as $producto) {
+                    $productos_nombres[] = $producto['nombre'];
+                }
+                $descripcion .= implode(', ', $productos_nombres);
+
+                $historial_data = [
+                    'historial_tipo' => 'venta',
+                    'historial_referencia_id' => $venta_id,
+                    'historial_cliente_id' => $_POST['venta_cliente_id'],
+                    'historial_usuario_id' => $_POST['venta_usuario_id'],
+                    'historial_descripcion' => $descripcion,
+                    'historial_monto' => $_POST['venta_total'],
+                    'historial_estado' => 'completada',
+                    'historial_situacion' => 1
+                ];
+
+                $historial = new HistorialVentas($historial_data);
+                $historial->crear();
 
                 http_response_code(200);
                 echo json_encode([
@@ -389,6 +411,9 @@ class VentasController extends ActiveRecord
             self::SQL($sql_anular_detalles);
 
             $ejecutar = Ventas::EliminarVentas($id);
+
+            $sql_ocultar_historial = "UPDATE historial_ventas SET historial_situacion = 0 WHERE historial_referencia_id = $id AND historial_tipo = 'venta'";
+            self::SQL($sql_ocultar_historial);
 
             http_response_code(200);
             echo json_encode([

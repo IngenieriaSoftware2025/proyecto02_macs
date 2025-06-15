@@ -59,4 +59,44 @@ class Reparaciones extends ActiveRecord {
         return self::SQL($sql);
     }
 
+    public static function IniciarReparacion($id){
+        $sql = "UPDATE reparacion SET reparacion_estado = 'en_proceso' WHERE reparacion_id = $id AND reparacion_estado = 'recibido'";
+        $resultado = self::SQL($sql);
+        
+        if ($resultado) {
+            $sql_check = "SELECT COUNT(*) as affected FROM reparacion WHERE reparacion_id = $id AND reparacion_estado = 'en_proceso'";
+            $check = self::fetchFirst($sql_check);
+            return $check && $check['affected'] > 0;
+        }
+        
+        return false;
+    }
+
+    public static function FinalizarReparacion($id){
+        $sql = "UPDATE reparacion SET reparacion_estado = 'finalizado' WHERE reparacion_id = $id AND reparacion_estado = 'en_proceso'";
+        $resultado = self::SQL($sql);
+        
+        if ($resultado) {
+            $sql_check = "SELECT COUNT(*) as affected FROM reparacion WHERE reparacion_id = $id AND reparacion_estado = 'finalizado'";
+            $check = self::fetchFirst($sql_check);
+            return $check && $check['affected'] > 0;
+        }
+        
+        return false;
+    }
+
+    public static function EntregarReparacion($id){
+        $fechaHoy = date('m/d/Y');
+        $sql = "UPDATE reparacion SET reparacion_estado = 'entregado', reparacion_fecha_entrega = '$fechaHoy' WHERE reparacion_id = $id AND reparacion_estado = 'finalizado'";
+        $resultado = self::SQL($sql);
+        
+        if ($resultado) {
+            $sql_check = "SELECT COUNT(*) as affected FROM reparacion WHERE reparacion_id = $id AND reparacion_estado = 'entregado'";
+            $check = self::fetchFirst($sql_check);
+            return $check && $check['affected'] > 0;
+        }
+        
+        return false;
+    }
+
 }

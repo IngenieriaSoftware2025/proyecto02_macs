@@ -7,6 +7,7 @@ use Exception;
 use MVC\Router;
 use Model\ActiveRecord;
 use Model\Reparaciones;
+use Model\HistorialVentas;
 
 class ReparacionesController extends ActiveRecord
 {
@@ -108,36 +109,20 @@ class ReparacionesController extends ActiveRecord
                 exit;
             }
 
-            $_POST['reparacion_estado'] = trim(htmlspecialchars($_POST['reparacion_estado']));
-            
-            if (empty($_POST['reparacion_estado']) || !in_array($_POST['reparacion_estado'], ['recibido', 'en_proceso', 'finalizado'])) {
-                http_response_code(400);
-                echo json_encode([
-                    'codigo' => 0,
-                    'mensaje' => 'Debe seleccionar un estado valido'
-                ]);
-                exit;
-            }
+            $_POST['reparacion_estado'] = 'recibido';
 
             $_POST['reparacion_precio'] = filter_var($_POST['reparacion_precio'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
-            
+
             if (empty($_POST['reparacion_precio']) || $_POST['reparacion_precio'] <= 0) {
                 http_response_code(400);
                 echo json_encode([
                     'codigo' => 0,
                     'mensaje' => 'El precio debe ser mayor a 0'
                 ]);
-                exit;
+                return;
             }
 
-            $_POST['reparacion_fecha_entrega'] = trim(htmlspecialchars($_POST['reparacion_fecha_entrega']));
-            
-            if (!empty($_POST['reparacion_fecha_entrega'])) {
-                $fecha = DateTime::createFromFormat('Y-m-d', $_POST['reparacion_fecha_entrega']);
-                $_POST['reparacion_fecha_entrega'] = $fecha->format('m/d/Y');
-            } else {
-                unset($_POST['reparacion_fecha_entrega']);
-            }
+            unset($_POST['reparacion_fecha_entrega']);
             
             $_POST['reparacion_situacion'] = 1;
             
@@ -147,6 +132,24 @@ class ReparacionesController extends ActiveRecord
             $resultado = $reparacion->crear();
 
             if($resultado['resultado'] == 1){
+                $reparacion_id = $resultado['id'];
+
+                $descripcion = "Reparacion: " . $_POST['reparacion_servicio'] . " - " . $_POST['reparacion_marca'] . " " . $_POST['reparacion_tipo_celular'];
+
+                $historial_data = [
+                    'historial_tipo' => 'reparacion',
+                    'historial_referencia_id' => $reparacion_id,
+                    'historial_cliente_id' => $_POST['reparacion_cliente_id'],
+                    'historial_usuario_id' => $_POST['reparacion_usuario_id'],
+                    'historial_descripcion' => $descripcion,
+                    'historial_monto' => $_POST['reparacion_precio'],
+                    'historial_estado' => 'recibida',
+                    'historial_situacion' => 1
+                ];
+
+                $historial = new HistorialVentas($historial_data);
+                $historial->crear();
+
                 http_response_code(200);
                 echo json_encode([
                     'codigo' => 1,
@@ -309,7 +312,7 @@ class ReparacionesController extends ActiveRecord
 
         $_POST['reparacion_estado'] = trim(htmlspecialchars($_POST['reparacion_estado']));
 
-        if (empty($_POST['reparacion_estado']) || !in_array($_POST['reparacion_estado'], ['recibido', 'en_proceso', 'finalizado'])) {
+        if (empty($_POST['reparacion_estado']) || !in_array($_POST['reparacion_estado'], ['recibido', 'en_proceso', 'finalizado', 'entregado'])) {
             http_response_code(400);
             echo json_encode([
                 'codigo' => 0,
@@ -375,10 +378,155 @@ class ReparacionesController extends ActiveRecord
         }
     }
 
+    public static function iniciarReparacionAPI()
+    {
+        getHeadersApi();
+        
+        try {
+            $id = filter_var($_POST['reparacion_id'], FILTER_SANITIZE_NUMBER_INT);
+            
+            if (empty($id) || $id < 1) {
+                http_response_code(400);
+                echo json_encode([
+                    'codigo' => 0,
+                    'mensaje' => 'ID de reparacion invalido'
+                ]);
+                return;
+            }
+
+            $resultado = Reparaciones::IniciarReparacion($id);
+
+            if ($resultado) {
+                http_response_code(200);
+                echo json_encode([
+                    'codigo' => 1,
+                    'mensaje' => 'La reparacion ha sido iniciada correctamente'
+                ]);
+            } else {
+                http_response_code(400);
+                echo json_encode([
+                    'codigo' => 0,
+                    'mensaje' => 'No se pudo iniciar la reparacion. Verifique el estado actual.'
+                ]);
+            }
+        } catch (Exception $e) {
+            http_response_code(400);
+            echo json_encode([
+                'codigo' => 0,
+                'mensaje' => 'Error al iniciar la reparacion',
+                'detalle' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    public static function finalizarReparacionAPI()
+    {
+        getHeadersApi();
+        
+        try {
+            $id = filter_var($_POST['reparacion_id'], FILTER_SANITIZE_NUMBER_INT);
+            
+            if (empty($id) || $id < 1) {
+                http_response_code(400);
+                echo json_encode([
+                    'codigo' => 0,
+                    'mensaje' => 'ID de reparacion invalido'
+                ]);
+                return;
+            }
+
+            $resultado = Reparaciones::FinalizarReparacion($id);
+
+            if ($resultado) {
+                http_response_code(200);
+                echo json_encode([
+                    'codigo' => 1,
+                    'mensaje' => 'La reparacion ha sido finalizada correctamente'
+                ]);
+            } else {
+                http_response_code(400);
+                echo json_encode([
+                    'codigo' => 0,
+                    'mensaje' => 'No se pudo finalizar la reparacion. Verifique el estado actual.'
+                ]);
+            }
+        } catch (Exception $e) {
+            http_response_code(400);
+            echo json_encode([
+                'codigo' => 0,
+                'mensaje' => 'Error al finalizar la reparacion',
+                'detalle' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    public static function entregarReparacionAPI()
+    {
+        getHeadersApi();
+        
+        try {
+            $id = filter_var($_POST['reparacion_id'], FILTER_SANITIZE_NUMBER_INT);
+            
+            if (empty($id) || $id < 1) {
+                http_response_code(400);
+                echo json_encode([
+                    'codigo' => 0,
+                    'mensaje' => 'ID de reparacion invalido'
+                ]);
+                return;
+            }
+
+            $resultado = Reparaciones::EntregarReparacion($id);
+
+            if ($resultado) {
+                $sql_reparacion = "SELECT r.*, c.cliente_nombre, u.usuario_nombre 
+                                  FROM reparacion r
+                                  INNER JOIN cliente c ON r.reparacion_cliente_id = c.cliente_id
+                                  INNER JOIN usuarios1 u ON r.reparacion_usuario_id = u.usuario_id
+                                  WHERE r.reparacion_id = $id";
+                $reparacion_data = self::fetchFirst($sql_reparacion);
+
+                if ($reparacion_data) {
+                    $descripcion = "Reparacion entregada: " . $reparacion_data['reparacion_servicio'] . " - " . $reparacion_data['reparacion_marca'] . " " . $reparacion_data['reparacion_tipo_celular'];
+
+                    $sql_actualizar_historial = "UPDATE historial_ventas 
+                                                SET historial_estado = 'entregada',
+                                                    historial_descripcion = '$descripcion'
+                                                WHERE historial_referencia_id = $id 
+                                                AND historial_tipo = 'reparacion'";
+                    self::SQL($sql_actualizar_historial);
+                }
+
+                http_response_code(200);
+                echo json_encode([
+                    'codigo' => 1,
+                    'mensaje' => 'La reparacion ha sido entregada correctamente'
+                ]);
+            } else {
+                http_response_code(400);
+                echo json_encode([
+                    'codigo' => 0,
+                    'mensaje' => 'No se pudo entregar la reparacion. Solo se pueden entregar reparaciones en estado Finalizado.'
+                ]);
+            }
+        } catch (Exception $e) {
+            http_response_code(400);
+            echo json_encode([
+                'codigo' => 0,
+                'mensaje' => 'Error al entregar la reparacion',
+                'detalle' => $e->getMessage(),
+            ]);
+        }
+    }
+
     public static function EliminarAPI()
     {
         try {
             $id = filter_var($_GET['id'], FILTER_SANITIZE_NUMBER_INT);
+            
+            $sql_ocultar_historial = "UPDATE historial_ventas SET historial_situacion = 0 WHERE historial_referencia_id = $id AND historial_tipo = 'reparacion'";
+            self::SQL($sql_ocultar_historial);
+            
             $ejecutar = Reparaciones::EliminarReparaciones($id);
 
             http_response_code(200);

@@ -59,24 +59,13 @@
                         </div>
 
                         <div class="row g-4 mb-3">
-                            <div class="col-md-4">
-                                <label for="reparacion_estado" class="form-label">Estado</label>
-                                <select class="form-select form-select-lg" id="reparacion_estado" name="reparacion_estado" required>
-                                    <option value="">Seleccione un estado</option>
-                                    <option value="recibido">Recibido</option>
-                                    <option value="en_proceso">En Proceso</option>
-                                    <option value="finalizado">Finalizado</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label for="reparacion_precio" class="form-label">Precio</label>
                                 <input type="number" class="form-control form-control-lg" id="reparacion_precio" name="reparacion_precio" placeholder="Ingrese precio" step="0.01" min="0.01" required>
                             </div>
-                            <div class="col-md-4">
-                                <label for="reparacion_fecha_entrega" class="form-label">Fecha de Entrega</label>
-                                <input type="date" class="form-control form-control-lg" id="reparacion_fecha_entrega" name="reparacion_fecha_entrega">
-                            </div>
                         </div>
+
+                        <input type="hidden" id="reparacion_estado" name="reparacion_estado" value="recibido">
                         
                         <div class="d-flex justify-content-center gap-3">
                             <button class="btn btn-success btn-lg px-4 shadow" type="submit" id="BtnGuardar">
@@ -101,7 +90,7 @@
         <div class="col-12 d-flex justify-content-center">
             <div class="card shadow-lg border-primary rounded-4" style="width: 98%;">
                 <div class="card-body">
-                    <h3 class="text-center text-primary mb-4">Reparaciones registradas en la base de datos</h3>
+                    <h3 class="text-center text-primary mb-4">Reparaciones organizadas por estado</h3>
 
                     <div class="table-responsive">
                         <table class="table table-striped table-hover table-bordered align-middle rounded-3 overflow-hidden w-100" id="TableReparaciones" style="width: 100% !important;">
@@ -115,11 +104,10 @@
                                     <th>Motivo</th>
                                     <th>Técnico</th>
                                     <th>Servicio</th>
-                                    <th>Estado</th>
                                     <th>Precio</th>
                                     <th>Fecha Entrega</th>
-                                    <th>Fecha Creación</th>
-                                    <th>Situación</th>
+                                    <th>Fecha Recibido</th>
+                                    <th>Estado</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
