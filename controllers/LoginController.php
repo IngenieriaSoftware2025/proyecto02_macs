@@ -14,41 +14,50 @@ class LoginController extends ActiveRecord
         $router->render('login/index', [], $layout = 'layout/layoutlogin');
     }
 
-    public static function login()
-    {
+    public static function login() {
         getHeadersApi();
-
+        
         try {
+            $dpi = htmlspecialchars($_POST['usu_codigo']);
+            $contrasena = htmlspecialchars($_POST['usu_password']);
 
-            $usuario_dpi = trim(htmlspecialchars($_POST['usuario_dpi']));
-            $usuario_password = htmlspecialchars($_POST['usuario_password']);
+            $queryExisteUser = "SELECT usuario_id, usuario_nom1, usuario_contra FROM usuario WHERE usuario_dpi = '$dpi' AND usuario_situacion = 1";
 
-            $queryExisteUser = "SELECT usuario_nombre, usuario_password, usuario_rol FROM usuarios1 WHERE usuario_dpi = '$usuario_dpi' AND usuario_situacion = 1";
+            $existeUsuario = ActiveRecord::fetchArray($queryExisteUser)[0];
 
-            $ExisteUsuario = ActiveRecord::fetchArray($queryExisteUser);
+            if ($existeUsuario) {
+                $passDB = $existeUsuario['usuario_contra'];
 
-            if ($ExisteUsuario && count($ExisteUsuario) > 0) {
-
-                $passDB = $ExisteUsuario[0]['usuario_password'];
-
-                if (password_verify($usuario_password, $passDB)) {
-
+                if (password_verify($contrasena, $passDB)) {
                     session_start();
 
-                    $nombreUser = $ExisteUsuario[0]['usuario_nombre'];
-                    $rolUser = $ExisteUsuario[0]['usuario_rol'];
-
+                    $nombreUser = $existeUsuario['usuario_nom1'];
+                    $usuarioId = $existeUsuario['usuario_id'];
+                    
                     $_SESSION['user'] = $nombreUser;
-                    $_SESSION['rol'] = $rolUser;
+                    $_SESSION['dpi'] = $dpi;
+                    $_SESSION['usuario_id'] = $usuarioId;
+
+                    $sqlpermisos = "SELECT permiso_nombre FROM permiso 
+                                  WHERE usuario_id = $usuarioId 
+                                  AND permiso_situacion = 1";
+
+                    $permisos = ActiveRecord::fetchArray($sqlpermisos);
+
+                    if (!empty($permisos)) {
+                        $_SESSION['rol'] = $permisos[0]['permiso_nombre'];
+                    } else {
+                        $_SESSION['rol'] = 'USUARIO_BASICO';
+                    }
 
                     echo json_encode([
                         'codigo' => 1,
-                        'mensaje' => 'usuario ingresado exitosamente',
+                        'mensaje' => 'Usuario iniciado exitosamente',
                     ]);
                 } else {
                     echo json_encode([
                         'codigo' => 0,
-                        'mensaje' => 'La contraseña que ingreso es Incorrecta',
+                        'mensaje' => 'La contraseña que ingreso es incorrecta',
                     ]);
                 }
             } else {
@@ -77,4 +86,13 @@ class LoginController extends ActiveRecord
         
         $router->render('pages/index', []);
     }
+
+    public static function logout(){
+        session_start();
+        $_SESSION = [];
+        session_destroy();
+        header("Location: /proyecto02_macs/");
+        exit;
+    }
+
 }
