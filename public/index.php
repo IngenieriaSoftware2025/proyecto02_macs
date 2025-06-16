@@ -13,6 +13,7 @@ use Controllers\VentasController;
 use Controllers\UsuariosController;
 use Controllers\ReparacionesController;
 use Controllers\HistorialVentasController;
+use Controllers\EstadisticasController;
 
 $router = new Router();
 $router->setBaseURL('/' . $_ENV['APP_NAME']);
@@ -91,5 +92,18 @@ $router->post('/reparaciones/entregarAPI', [ReparacionesController::class, 'entr
 $router->get('/historial', [HistorialVentasController::class, 'renderizarPagina']);
 $router->get('/historial/buscarAPI', [HistorialVentasController::class, 'buscarAPI']);
 $router->get('/historial/buscarDetalleAPI', [HistorialVentasController::class, 'buscarDetalleAPI']);
+
+//estadisticas
+$router->get('/estadisticas', [EstadisticasController::class, 'renderizarPagina']);
+$router->get('/estadisticas/buscarMarcasVendidasAPI', [EstadisticasController::class, 'buscarMarcasVendidasAPI']);
+$router->get('/estadisticas/buscarEstadosReparacionesAPI', [EstadisticasController::class, 'buscarEstadosReparacionesAPI']);
+$router->get('/estadisticas/buscarClientesFrecuentesAPI', [EstadisticasController::class, 'buscarClientesFrecuentesAPI']);
+$router->get('/estadisticas/buscarEmpleadosProductivosAPI', [EstadisticasController::class, 'buscarEmpleadosProductivosAPI']);
+$router->get('/estadisticas/buscarStockCriticoAPI', [EstadisticasController::class, 'buscarStockCriticoAPI']);
+$router->get('/estadisticas/buscarServiciosReparacionAPI', [EstadisticasController::class, 'buscarServiciosReparacionAPI']);
+$router->get('/estadisticas/buscarVentasMensualesAPI', [EstadisticasController::class, 'buscarVentasMensualesAPI']);
+$router->get('/estadisticas/buscarCelularesMasVendidosAPI', [EstadisticasController::class, 'buscarCelularesMasVendidosAPI']);
+$router->get('/estadisticas/buscarReparacionesPorMarcaAPI', [EstadisticasController::class, 'buscarReparacionesPorMarcaAPI']);
+$router->get('/estadisticas/buscarIngresosPorTipoAPI', [EstadisticasController::class, 'buscarIngresosPorTipoAPI']);
 
 $router->comprobarRutas();

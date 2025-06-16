@@ -16,8 +16,8 @@ const seccionTabla = document.getElementById('seccionTabla');
 const organizarDatosPorTipo = (data) => {
     const tipos = ['venta', 'reparacion'];
     const iconos = {
-        'venta': '💰',
-        'reparacion': '🔧'
+        'venta': '',
+        'reparacion': ''
     };
     const nombres = {
         'venta': 'VENTAS',
