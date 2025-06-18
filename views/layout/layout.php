@@ -1,9 +1,11 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <script src="build/js/app.js"></script> -->
     <link rel="shortcut icon" href="<?= asset('images/cit.png') ?>" type="image/x-icon">
     <link rel="stylesheet" href="<?= asset('build/styles.css') ?>">
     <title>Sistema Celulares</title>
@@ -14,6 +16,8 @@
             overflow-x: hidden;
             max-width: 100vw;
         }
+
+
 
         .sidebar {
             position: fixed;
@@ -44,17 +48,9 @@
 
         .sidebar-brand:hover {
             color: #e3f2fd !important;
-            transform: translateY(-1px);
         }
 
-        .sidebar-brand img {
-            transition: transform 0.3s ease;
-            margin-right: 8px;
-        }
 
-        .sidebar-brand:hover img {
-            transform: scale(1.05);
-        }
 
         .nav-link {
             color: rgba(255, 255, 255, 0.9) !important;
@@ -70,7 +66,6 @@
         .nav-link:hover {
             color: white !important;
             background: rgba(255, 255, 255, 0.15) !important;
-            transform: translateY(-1px);
         }
 
         .nav-link i {
@@ -114,31 +109,15 @@
             overflow: hidden;
         }
 
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s ease;
-        }
 
-        .btn:hover::before {
-            left: 100%;
-        }
 
         .btn-danger {
             background: linear-gradient(135deg, #dc3545, #bd2130);
             box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
-            margin: 20px 10px 20px 10px;
-            width: calc(100% - 20px);
         }
 
         .btn-danger:hover {
             background: linear-gradient(135deg, #bd2130, #a71e2a);
-            transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(220, 53, 69, 0.4);
         }
 
@@ -221,46 +200,7 @@
             padding: 0 2rem;
         }
 
-        .footer-title {
-            font-size: 2.2rem;
-            font-weight: 800;
-            margin-bottom: 1.5rem;
-            color: white;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
 
-        .footer-description {
-            font-size: 1.1rem;
-            font-weight: 500;
-            margin-bottom: 2rem;
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        .footer-tech {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .tech-item {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 0.8rem 1.5rem;
-            border-radius: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: white;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-        }
-
-        .tech-item:hover {
-            transform: translateY(-2px);
-            background: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
 
         .footer-copyright {
             font-size: 0.95rem;
@@ -292,10 +232,12 @@
     </style>
 </head>
 <body>
+
+
     <div class="sidebar">
         <a class="sidebar-brand" href="/proyecto02_macs/inicio">
             <i class="bi bi-phone-fill" style="font-size: 1.5rem; margin-right: 8px;"></i>
-            Sistema Celulares
+            MACS
         </a>
         
         <ul class="navbar-nav">
@@ -309,6 +251,7 @@
                 </a>
             </li>
 
+            <?php if ($_SESSION['usuario_rol'] === 'ADMIN'): ?>
             <li class="nav-item">
                 <a class="nav-link px-3" href="/proyecto02_macs/usuarios">
                     <i class="bi bi-people-fill me-2"></i>Usuarios/Empleados
@@ -326,6 +269,7 @@
                     <i class="bi bi-phone-fill me-2"></i>Celulares
                 </a>
             </li>
+            <?php endif; ?>
 
             <li class="nav-item">
                 <a class="nav-link px-3" href="/proyecto02_macs/inventario">
@@ -345,6 +289,7 @@
                 </a>
             </li>
 
+            <?php if ($_SESSION['usuario_rol'] === 'ADMIN'): ?>
             <li class="nav-item dropdown-simple">
                 <a class="nav-link px-3" href="#" style="display: flex; align-items: center;">
                     <i class="bi bi-bar-chart-fill me-2"></i>Reportes<i class="bi bi-chevron-down ms-2" style="font-size: 0.7em;"></i>
@@ -358,10 +303,18 @@
                     </li>
                 </ul>
             </li>
+            <?php endif; ?>
         </ul> 
         
-        <div class="d-flex">
-            <button onclick="logout()" class="btn btn-danger"><i class="bi bi-arrow-bar-left"></i>Cerrar Sesión</button>
+        <div style="padding: 15px 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: auto;">
+            <div style="color: white; text-align: center; margin-bottom: 15px;">
+                <i class="bi bi-person-circle" style="font-size: 1.2rem; margin-right: 8px;"></i>
+                <div style="font-weight: 600; font-size: 0.95rem;"><?= $_SESSION['user'] ?? 'Usuario' ?></div>
+                <div style="background: rgba(255, 255, 255, 0.2); padding: 3px 10px; border-radius: 10px; font-size: 0.8rem; margin-top: 5px; display: inline-block;">
+                    <?= $_SESSION['usuario_rol'] ?? 'EMPLEADO' ?>
+                </div>
+            </div>
+            <button onclick="logout()" class="btn btn-danger" style="margin: 0; width: 100%;"><i class="bi bi-arrow-bar-left"></i>Cerrar Sesión</button>
         </div>
     </div>
 

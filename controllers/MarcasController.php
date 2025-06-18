@@ -12,6 +12,12 @@ class MarcasController extends ActiveRecord
 
     public static function renderizarPagina(Router $router)
     {
+        session_start();
+        if (!isset($_SESSION['usuario_rol']) || $_SESSION['usuario_rol'] !== 'ADMIN') {
+            header('Location: /proyecto02_macs/inicio');
+            exit;
+        }
+        
         $router->render('marcas/index', []);
     }
 

@@ -1,3 +1,9 @@
+<?php
+session_start();
+$isAdmin = ($_SESSION['usuario_rol'] ?? 'EMPLEADO') === 'ADMIN';
+$userName = $_SESSION['user'] ?? 'Usuario';
+$userRole = $_SESSION['usuario_rol'] ?? 'EMPLEADO';
+?>
 <style>
     body {
         background: #f8fbff;
@@ -28,65 +34,6 @@
         75% { transform: translateX(-10px) translateY(20px); }
     }
 
-    .floating-shapes {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: -1;
-    }
-
-    .shape {
-        position: absolute;
-        background: rgba(74, 144, 226, 0.2);
-        border-radius: 50%;
-        animation: float 15s infinite linear;
-    }
-
-    .shape:nth-child(1) {
-        width: 80px;
-        height: 80px;
-        top: 20%;
-        left: 10%;
-        animation-delay: 0s;
-        animation-duration: 20s;
-    }
-
-    .shape:nth-child(2) {
-        width: 120px;
-        height: 120px;
-        top: 60%;
-        right: 15%;
-        animation-delay: 5s;
-        animation-duration: 25s;
-    }
-
-    .shape:nth-child(3) {
-        width: 60px;
-        height: 60px;
-        bottom: 30%;
-        left: 70%;
-        animation-delay: 10s;
-        animation-duration: 18s;
-    }
-
-    .shape:nth-child(4) {
-        width: 100px;
-        height: 100px;
-        top: 40%;
-        left: 60%;
-        animation-delay: 15s;
-        animation-duration: 22s;
-    }
-
-    @keyframes float {
-        0% { transform: translateY(0px) rotate(0deg); opacity: 0.7; }
-        50% { transform: translateY(-100px) rotate(180deg); opacity: 0.3; }
-        100% { transform: translateY(0px) rotate(360deg); opacity: 0.7; }
-    }
-
     .header {
         padding: 3rem 2rem;
         text-align: center;
@@ -101,22 +48,6 @@
         border: 1px solid rgba(44, 90, 160, 0.2);
         box-shadow: 0 8px 25px rgba(44, 90, 160, 0.15);
     }
-
-    .header::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: linear-gradient(45deg, transparent, rgba(74, 144, 226, 0.2), transparent);
-        animation: shimmer 4s infinite;
-    }
-
-    @keyframes shimmer {
-        0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-        100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-    }
     
     .logo {
         font-size: 3.5rem;
@@ -126,10 +57,52 @@
         text-shadow: 0 2px 4px rgba(44, 90, 160, 0.3);
     }
 
-    @keyframes textGlow {
-        0%, 100% { filter: brightness(1); }
-        50% { filter: brightness(1.2); }
+    .welcome-section {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(44, 90, 160, 0.2);
+        box-shadow: 0 5px 15px rgba(44, 90, 160, 0.1);
     }
+
+    .user-welcome {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 1rem;
+    }
+
+    .user-avatar {
+        width: 50px;
+        height: 50px;
+        background: #2c5aa0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+    }
+
+    .user-details h3 {
+        margin: 0;
+        color: #2c5aa0;
+        font-weight: 700;
+    }
+
+    .user-role-badge {
+        background: #28a745;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+
     
     .container {
         max-width: 1140px;
@@ -269,21 +242,6 @@
         overflow: hidden;
     }
 
-    .btn::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-        transition: left 0.5s ease;
-    }
-
-    .btn:hover::before {
-        left: 100%;
-    }
-
     .btn-primary {
         background: linear-gradient(135deg, #2c5aa0, #1e3f73);
         box-shadow: 0 4px 15px rgba(44, 90, 160, 0.3);
@@ -388,12 +346,23 @@
     </div>
     
     <div class="container">
-        <div class="row mb-5">
-            <div class="col-md-8 mx-auto text-center">
-                <p class="lead">
-                    "Administra de manera eficiente tu negocio de celulares con módulos para inventario, ventas, reparaciones y clientes. Controla el stock, gestiona usuarios y mantén un registro completo de forma sencilla y profesional."
-                </p>
+        <div class="welcome-section">
+            <div class="user-welcome">
+            <div class="user-avatar">
+                <i class="bi bi-person-fill"></i>
             </div>
+            <div class="user-details text-center">
+                <h3><?= $userName ?></h3>
+                <span class="user-role-badge"><?= $userRole ?></span>
+            </div>
+            </div>
+            <p class="text-center text-muted mb-0">
+            <?php if ($isAdmin): ?>
+                Tienes acceso completo a todos los módulos del sistema
+            <?php else: ?>
+                Tienes acceso a: Clientes, Ventas, Reparaciones e Inventario
+            <?php endif; ?>
+            </p>
         </div>
         
         <div class="row mb-4">
@@ -417,6 +386,7 @@
                 </div>
             </div>
             
+            <?php if ($isAdmin): ?>
             <div class="col-md-4 mb-4">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-img-top product-img">
@@ -461,6 +431,7 @@
                     </div>
                 </div>
             </div>
+            <?php endif; ?>
             
             <div class="col-md-4 mb-4">
                 <div class="card border-0 shadow-sm h-100">
@@ -471,7 +442,13 @@
                         <h5 class="card-title fw-bold">
                             <i class="bi bi-box-seam-fill me-2 text-secondary"></i>Inventario
                         </h5>
-                        <p class="card-text text-muted">Controla el stock, precios y disponibilidad de productos.</p>
+                        <p class="card-text text-muted">
+                            <?php if ($isAdmin): ?>
+                                Controla el stock, precios y disponibilidad de productos.
+                            <?php else: ?>
+                                Consulta disponibilidad y precios de productos.
+                            <?php endif; ?>
+                        </p>
                         <a href="/proyecto02_macs/inventario" class="btn btn-secondary">Acceder</a>
                     </div>
                 </div>
@@ -507,6 +484,7 @@
                 </div>
             </div>
             
+            <?php if ($isAdmin): ?>
             <div class="col-md-4 mb-4">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-img-top product-img">
@@ -536,15 +514,12 @@
                     </div>
                 </div>
             </div>
+            <?php endif; ?>
         </div>
         
         <div class="row mt-5">
             <div class="col-md-6 mx-auto text-center">
-                <h2 class="mb-4 text-uppercase fw-bold">Características Principales</h2><br>
-                <p><strong>Organiza:</strong> mantén ordenados todos los datos de clientes, inventario y ventas.</p>
-                <p><strong>Controla:</strong> gestiona el stock automáticamente y supervisa las reparaciones.</p>
-                <p><strong>Administra:</strong> supervisa todo el negocio desde una interfaz intuitiva.</p>
-                <a href="/proyecto02_macs/clientes" class="btn btn-primary btn-lg mt-3">Comenzar a administrar</a>
+                <a href="/proyecto02_macs/clientes" class="btn btn-primary btn-lg mt-3">Comenzar a administrar</a><br><br>
             </div>
         </div>
     </div>
